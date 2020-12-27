@@ -1,0 +1,25 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                git 'https://github.com/jleetutorial/maven-project.git'
+
+                // Run Maven on a Unix agent.
+                sh "mvn clean package"
+
+            }
+
+            post {
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    archiveArtifacts '**/*.war'
+                    build 'deliver_package_pipeline'
+                }
+            }
+        }
+    }
+}
